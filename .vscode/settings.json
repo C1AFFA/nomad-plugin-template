@@ -1,4 +1,7 @@
 {
+  "python.testing.pytestPath": ".pyenv/bin/pytest",
+  "python.defaultInterpreterPath": ".pyenv/bin/python",
+  "python.languageServer": "Pylance",
   "editor.rulers": [
     90
   ],
@@ -18,4 +21,5 @@
   ],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true
+
 }

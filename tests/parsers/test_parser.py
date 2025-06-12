@@ -1,6 +1,9 @@
 import logging
 import numpy as np # Import numpy for type comparison if needed
-
+import sys
+import os
+from pydantic import BaseModel
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from nomad.datamodel import EntryArchive
 
 from nomad_test_parser.parsers.parser import NewParser, SimpleOutput,JVParser,RawFileUNITOV # Import SimpleOutput
@@ -8,9 +11,15 @@ from nomad_test_parser.parsers.parser import NewParser, SimpleOutput,JVParser,Ra
 from nomad.datamodel import EntryArchive, EntryMetadata
 from nomad.datamodel.metainfo.workflow import Workflow
 
+
 def test_parse_file():
     parser = NewParser()
-    archive = EntryArchive(metadata=EntryMetadata(), workflow2=Workflow(name='test'))
+    meta_data = EntryMetadata();
+
+    archive = EntryArchive(metadata=meta_data, workflow2=Workflow(name='test'))
+    assert not archive.metadata == None;
+    archive.metadata.user_id = 0;
+
     mainfile_path = 'tests/data/example.out' # Define mainfile_path for clarity
     parser.parse(mainfile_path, archive, logging.getLogger())
 
