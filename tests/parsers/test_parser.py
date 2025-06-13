@@ -62,11 +62,11 @@ def test_parse_JV_file():
 
     archive.workflow2=Workflow(name='test');
 
-    meta_data = EntryMetadata();
-    meta_data.main_author = User();
-    meta_data.main_author.user_id = "42";
+    #meta_data = EntryMetadata();
+    #meta_data.main_author = User();
+    #meta_data.main_author.user_id = "42";
 
-    archive.metadata=meta_data;
+    #archive.metadata=meta_data;
 
     mainfile_path = '001_2023_10_19_18.33.25_1A_3C_C1_1_JV.txt' # Define mainfile_path for clarity
     parser.parse(mainfile_path, archive, logging.getLogger())

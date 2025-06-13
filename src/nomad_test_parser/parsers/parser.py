@@ -38,7 +38,7 @@ class RawFileUNITOV(EntryData):
     )
 
 
-class UNITOV_JVmeasurement(JVMeasurement, EntryData):
+class UNITOV_JVmeasurement(JVMeasurement, RawFileUNITOV):
     m_def = Section(
         a_eln=dict(
             hide=[
@@ -161,14 +161,13 @@ class JVParser(MatchingParser):
         print("Parse JV curve ==========================================")
 
         # 1. Create an instance of your custom section
-        entry = UNITOV_JVmeasurement()
+        #entry = UNITOV_JVmeasurement()
         notes = ''
 
         # 2. Populate the section with some data
         #    (In a real parser, this data would come from parsing the 'mainfile')
-        entry.message = 'This is a test JV measurement parsing.'
 
-        archive.metadata.entry_name = os.path.basename(mainfile)
+        #archive.metadata.entry_name = os.path.basename(mainfile)
 
         #mainfile_split = mainfile.split('.');
 
@@ -182,13 +181,15 @@ class JVParser(MatchingParser):
         #if not measurment_type in ["uvvis", "sem", "SEM"]:
         #    entry.data_file = os.path.basename(mainfile)
 
-        entry.datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+
 
         file_name = f'{os.path.basename(mainfile)}.archive.json'
-        eid = get_entry_id_from_file_name(file_name, archive)
+        #eid = get_entry_id_from_file_name(file_name, archive)
 
-        archive.data = RawFileUNITOV(processed_archive=get_reference(archive.metadata.upload_id, eid))
-
+        #archive.data = UNITOV_JVmeasurement(processed_archive=get_reference(archive.metadata.upload_id, eid))
+        archive.data = UNITOV_JVmeasurement()
+        archive.data.message = 'This is a test JV measurement parsing.'
+        archive.data.datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         #create_archive(entry, archive, file_name)
 
         # 3. Assign your custom section to archive.data
