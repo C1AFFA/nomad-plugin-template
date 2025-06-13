@@ -5,7 +5,7 @@ import os
 from pydantic import BaseModel
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from nomad_test_parser.parsers.parser import NewParser, SimpleOutput,JVParser,RawFileUNITOV # Import SimpleOutput
+from nomad_test_parser.parsers.parser import NewParser, SimpleOutput,JVParser,RawFileUNITOV,UNITOV_JVmeasurement # Import SimpleOutput
 
 from nomad.datamodel import EntryArchive, EntryMetadata
 from nomad.datamodel.metainfo.workflow import Workflow

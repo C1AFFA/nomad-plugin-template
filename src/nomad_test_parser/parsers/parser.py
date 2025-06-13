@@ -161,7 +161,7 @@ class JVParser(MatchingParser):
         print("Parse JV curve ==========================================")
 
         # 1. Create an instance of your custom section
-        entry = JVMeasurement()
+        entry = UNITOV_JVmeasurement()
         notes = ''
 
         # 2. Populate the section with some data
@@ -170,14 +170,14 @@ class JVParser(MatchingParser):
 
         archive.metadata.entry_name = os.path.basename(mainfile)
 
-        mainfile_split = mainfile.split('.');
+        #mainfile_split = mainfile.split('.');
 
-        if not mainfile_split[-1] in ["nk"]:
-            search_id = mainfile_split[0]
-            set_sample_reference(archive, entry, search_id)
+        #if not mainfile_split[-1] in ["nk"]:
+        #    search_id = mainfile_split[0]
+        #    set_sample_reference(archive, entry, search_id)
 
-            entry.name = f"{search_id} {notes}"
-            entry.description = f"Notes from file name: {notes}"
+        #    entry.name = f"{search_id} {notes}"
+        #    entry.description = f"Notes from file name: {notes}"
 
         #if not measurment_type in ["uvvis", "sem", "SEM"]:
         #    entry.data_file = os.path.basename(mainfile)
@@ -186,8 +186,10 @@ class JVParser(MatchingParser):
 
         file_name = f'{os.path.basename(mainfile)}.archive.json'
         eid = get_entry_id_from_file_name(file_name, archive)
+
         archive.data = RawFileUNITOV(processed_archive=get_reference(archive.metadata.upload_id, eid))
-        create_archive(entry, archive, file_name)
+
+        #create_archive(entry, archive, file_name)
 
         # 3. Assign your custom section to archive.data
         #    archive.data is the typical place for the primary data extracted by the parser.
