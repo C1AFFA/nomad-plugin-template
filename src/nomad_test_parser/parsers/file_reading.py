@@ -168,7 +168,7 @@ def read_file_jv_data_stab(filedata):
     # Block to clean up some bad characters found in the file which gives
     # trouble reading.
 
-    filedata = filedata.replace("²", "^2")
+    #filedata = filedata.replace("²", "^2")
 
     df = pd.read_csv(
         StringIO(filedata),
@@ -241,35 +241,36 @@ def read_file_jv_data(filedata):
     # Block to clean up some bad characters found in the file which gives
     # trouble reading.
 
-    filedata = filedata.replace("²", "^2")
+    #filedata = filedata.replace("²", "^2")
+    with filedata as file:
+        content = file.read();
+        df = pd.read_csv(
+            StringIO(content),
+            skiprows=42,
+            nrows=3,
+            sep='\t',
+            index_col=0,
+            engine='python',
+            encoding='unicode_escape')
 
-    df = pd.read_csv(
-        StringIO(filedata),
-        skiprows=42,
-        nrows=3,
-        sep='\t',
-        index_col=0,
-        engine='python',
-        encoding='unicode_escape')
-
-    df_header = pd.read_csv(StringIO(filedata),
-                            skiprows=2,
-                            nrows=39,
-                            header=None,
-                            sep='\t',
-                            index_col=0,
-                            encoding='unicode_escape',
-                            engine='python').T
+        df_header = pd.read_csv(StringIO(content),
+                                skiprows=2,
+                                nrows=39,
+                                header=None,
+                                sep='\t',
+                                index_col=0,
+                                encoding='unicode_escape',
+                                engine='python').T
 
 
-    nlines = filedata.count('\n')
+        nlines = content.count('\n')
 
-    df_curves = pd.read_csv(StringIO(filedata),
-                            skiprows=47,
-                            nrows=nlines-47-2,
-                            sep='\t',
-                            encoding='unicode_escape',
-                            engine='python')
+        df_curves = pd.read_csv(StringIO(content),
+                                skiprows=47,
+                                nrows=nlines-47-2,
+                                sep='\t',
+                                encoding='unicode_escape',
+                                engine='python')
 
 
     df_curves = df_curves.dropna(how='all', axis=1)
@@ -283,7 +284,7 @@ def read_file_jv_data(filedata):
     print(df_header.T)
 
     jv_dict = {}
-    jv_dict['active_area'] = df_header['Cell Area (cm2)'].iloc[0]
+    jv_dict['active_area'] = float(df_header['Cell Area (cm2)'].iloc[0])
     jv_dict['intensity'] = 100
 
 
@@ -294,10 +295,13 @@ def read_file_jv_data(filedata):
 
     df = df.drop([np.nan]).astype(float)
 
-    print(df)
+    #print(df)
 
     jv_dict['J_sc'] = list(abs(df['Jsc']))[:number_of_curves]
     jv_dict['V_oc'] = list(abs(df['Voc']))[:number_of_curves]
+
+    #print(jv_dict['V_oc'])
+
     jv_dict['Fill_factor'] = list(df['FF'])[:number_of_curves]
     jv_dict['Efficiency'] = list(df['Eff'])[:number_of_curves]
     jv_dict['P_MPP'] = list(df['P_MPP'])[:number_of_curves]
@@ -308,10 +312,11 @@ def read_file_jv_data(filedata):
     jv_dict['jv_curve'] = []
 
 
-    for column in range(1, len(df_curves.columns)):
-        jv_dict['jv_curve'].append({'name': df_curves.columns[column],
-                                    'voltage': df_curves[df_curves.columns[0]].values,
-                                    'current_density': df_curves[df_curves.columns[column]].values})
+    for n in range(0, len(df_curves.columns),2):
+
+        jv_dict['jv_curve'].append({'name': "Scan " + str(n+1) ,
+                                    'voltage': df_curves[df_curves.columns[n]].values,
+                                    'current_density': df_curves[df_curves.columns[n+1]].values})
 
 
 

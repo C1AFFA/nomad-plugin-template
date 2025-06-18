@@ -18,13 +18,17 @@ from nomad.metainfo.metainfo import (
     MSection,
     Quantity,
     Reference,
-    Section,
+    Section
 )
+from nomad.datamodel.context import ServerContext;
 from nomad.datamodel.data import EntryData, ArchiveSection, User, UserReference, AuthorReference
+from nomad.files import UploadFiles;
 #from nomad.datamodel.datamodel import MongoUploadMetadata, EditableUserMetadata,AuthLevel;
 #from nomad.metainfo.elasticsearch_extension import Elasticsearch,DocumentType;
 
 print(EntryMetadata().main_author)
+from nomad.processing import Upload
+from pathlib import Path
 
 
 def test_parse_file():
@@ -56,10 +60,22 @@ def test_parse_file():
     # assert archive.workflow2.name == 'test'
 
 def test_parse_JV_file():
-
+    try:
+        nested_directory_path = Path(".volumes/fs/staging/42/42")
+        # Create nested directories
+        nested_directory_path.mkdir(parents=True, exist_ok=True)
+        #os.mkdirs('.volumes/fs/staging/42/42')
+        print(f"Directory created successfully.")
+    except FileExistsError:
+        print(f"Directory .volumes/fs/staging/42/42 already exists.")
+    mainfile_path = '001_2023_10_19_18.33.25_1A_3C_C1_1_JV.txt'
     parser = JVParser()
-    archive = EntryArchive()
+    context = ServerContext(Upload(upload_id="42"))
+    context.uploadFiles = UploadFiles.get("42",create=True)
 
+    archive = EntryArchive(m_context=context)
+    archive.metadata = EntryMetadata();
+    archive.metadata.entry_name = 'test'
     archive.workflow2=Workflow(name='test');
 
     #meta_data = EntryMetadata();
@@ -68,8 +84,13 @@ def test_parse_JV_file():
 
     #archive.metadata=meta_data;
 
-    mainfile_path = '001_2023_10_19_18.33.25_1A_3C_C1_1_JV.txt' # Define mainfile_path for clarity
+     # Define mainfile_path for clarity
     parser.parse(mainfile_path, archive, logging.getLogger())
+
+    #Check if datafile available
+    assert archive.data.data_file;
+
+    archive.data.normalize(archive, logging.getLogger());
 
     # Check if archive.data is an instance of RawFileUNITOV
     assert isinstance(archive.data, RawFileUNITOV)

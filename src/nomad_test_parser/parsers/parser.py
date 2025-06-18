@@ -29,6 +29,7 @@ from nomad.datamodel.metainfo.annotations import (
     ELNAnnotation,
 )
 
+
 class RawFileUNITOV(EntryData):
     processed_archive = Quantity(
         type=Entity,
@@ -73,6 +74,7 @@ class UNITOV_JVmeasurement(JVMeasurement, RawFileUNITOV):
             }])
 
     def normalize(self, archive, logger):
+        print("strating normalize with datafile: ",self.data_file)
         if self.data_file:
             # todo detect file format
             from baseclasses.helper.utilities import get_encoding
@@ -87,6 +89,8 @@ class UNITOV_JVmeasurement(JVMeasurement, RawFileUNITOV):
 
                 self.location = location
                 get_jv_archive(jv_dict, self.data_file, self)
+
+            print("=======================================WRITTEN DATA IN ARCHIVE")
 
         super(UNITOV_JVmeasurement,
               self).normalize(archive, logger)
@@ -190,6 +194,8 @@ class JVParser(MatchingParser):
         archive.data = UNITOV_JVmeasurement()
         archive.data.message = 'This is a test JV measurement parsing.'
         archive.data.datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        archive.data.data_file = mainfile;
+        archive.data.m_to_dict(with_root_def=True)
 
         #create_archive(entry, archive, file_name)
 
