@@ -89,7 +89,7 @@ class UNITOV_JVmeasurement(JVMeasurement, RawFileUNITOV):
 
                 self.location = location
                 get_jv_archive(jv_dict, self.data_file, self)
-
+            
             print("=======================================WRITTEN DATA IN ARCHIVE")
 
         super(UNITOV_JVmeasurement,
@@ -187,17 +187,18 @@ class JVParser(MatchingParser):
 
 
 
-        #file_name = f'{os.path.basename(mainfile)}.archive.json'
+        file_name = f'{os.path.basename(mainfile)}.archive.json'
         #eid = get_entry_id_from_file_name(file_name, archive)
 
         #archive.data = UNITOV_JVmeasurement(processed_archive=get_reference(archive.metadata.upload_id, eid))
         archive.data = UNITOV_JVmeasurement()
+        basename = os.path.basename(mainfile)
         archive.data.message = 'This is a test JV measurement parsing.'
         archive.data.datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-        archive.data.data_file = mainfile;
+        archive.data.data_file = basename;
         archive.data.m_to_dict(with_root_def=True)
+        create_archive(archive.data, archive, file_name, overwrite=True)
 
-        #create_archive(entry, archive, file_name)
 
         # 3. Assign your custom section to archive.data
         #    archive.data is the typical place for the primary data extracted by the parser.
