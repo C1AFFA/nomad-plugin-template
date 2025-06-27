@@ -119,49 +119,51 @@ def arrange_eqe_columns(df):
     return photon_energy_raw, eqe_raw
 
 
-def read_file_eqe(file_path, header_lines=None):
+def read_file_eqe(filedata, header_lines=None):
     """
     Reads the file and returns the columns in a pandas DataFrame `df`.
     :return: df
     :rtype: pandas.DataFrame
     """
+
     if header_lines is None:
         header_lines = 0
     if header_lines == 0:  # in case you have a header
         try:
-            df = pd.read_csv(file_path, header=None, sep='\t',)
+            df = pd.read_csv(StringIO(filedata.read()), header=None, sep='\t',)
             if len(df.columns) < 2:
                 raise IndexError
         except IndexError:
-            df = pd.read_csv(file_path, header=None)
+            df = pd.read_csv(StringIO(filedata.read()), header=None)
     else:
         try:
             # header_lines - 1 assumes last header line is column names
-            df = pd.read_csv(file_path, header=int(header_lines - 1), sep='\t')
+            df = pd.read_csv(StringIO(filedata.read()), header=int(header_lines - 1), sep='\t')
             if len(df.columns) < 2:
                 raise IndexError
         except IndexError:
             try:  # wrong separator?
-                df = pd.read_csv(file_path, header=int(header_lines - 1))
+                df = pd.read_csv(StringIO(filedata.read()), header=int(header_lines - 1))
                 if len(df.columns) < 2:
                     raise IndexError
             except IndexError:
                 try:  # separator was right, but last header_line is not actually column names?
-                    df = pd.read_csv(file_path, header=int(header_lines), sep='\t')
+                    df = pd.read_csv(StringIO(filedata.read()), header=int(header_lines), sep='\t')
                     if len(df.columns) < 2:
                         raise IndexError
                 except IndexError:
                     # Last guess: separator was wrong AND last header_line is not actually column names?
-                    df = pd.read_csv(file_path, header=int(header_lines))
+                    df = pd.read_csv(StringIO(filedata.read()), header=int(header_lines))
                     if len(df.columns) < 2:
                         raise IndexError
     #print(df)
 
     df = df.apply(pd.to_numeric, errors='coerce')
     df = df.dropna()
+    #print(df)
     photon_energy_raw, eqe_raw = arrange_eqe_columns(df)
     photon_energy, intensity = interpolate_eqe(photon_energy_raw, eqe_raw)
-    return (photon_energy_raw, eqe_raw, photon_energy, intensity),UPDLOADED_FLAG
+    return {'photon_energy_raw':photon_energy_raw, 'eqe_raw':eqe_raw, 'photon_energy':photon_energy, 'intensity':intensity},UPDLOADED_FLAG
 
 
 def read_file_jv_data_stab(filedata):
