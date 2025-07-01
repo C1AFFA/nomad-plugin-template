@@ -5,7 +5,7 @@ import os
 from pydantic import BaseModel
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from nomad_test_parser.parsers.parser import NewParser, SimpleOutput,JVParser,EQEParser,RawFileUNITOV,UNITOV_JVmeasurement # Import SimpleOutput
+from nomad_test_parser.parsers.parser import NewParser, SimpleOutput,JVParser,EQEParser,MPPTParser,RawFileUNITOV,UNITOV_JVmeasurement # Import SimpleOutput
 
 from nomad.datamodel import EntryArchive, EntryMetadata
 from nomad.datamodel.metainfo.workflow import Workflow
@@ -144,14 +144,39 @@ def test_parse_EQE_file():
     # Check if archive.data is an instance of RawFileUNITOV
     assert isinstance(archive.data, RawFileUNITOV)
 
-    # Check the populated values in archive.data
+def test_parse_MPPT_file():
+    try:
+        nested_directory_path = Path(".volumes/fs/staging/42/42")
+        # Create nested directories
+        nested_directory_path.mkdir(parents=True, exist_ok=True)
+        #os.mkdirs('.volumes/fs/staging/42/42')
+        print(f"Directory created successfully.")
+    except FileExistsError:
+        print(f"Directory .volumes/fs/staging/42/42 already exists.")
 
-    #assert archive.data.message == 'This is a test message from NewParser.'
-    #assert archive.data.example_value == 123.456
-    #assert archive.data.parsed_mainfile_path == mainfile_path
+    mainfile_path = '000_2023_10_19_18.33.10_1A_3C_C1_1_Tracking.txt'
+    parser = MPPTParser()
+    context = ServerContext(Upload(upload_id="42"))
+    context.uploadFiles = UploadFiles.get("42",create=True)
 
-    # The assertion for workflow2.name can remain if it's still relevant
-    # For the current parser.py, workflow2 is not being set, so this would fail.
-    # If you re-add `archive.workflow2 = Workflow(name='test')` to your parser,
-    # then you can uncomment the line below.
-    # assert archive.workflow2.name == 'test'
+    archive = EntryArchive(m_context=context)
+    archive.metadata = EntryMetadata();
+    archive.metadata.entry_name = 'test'
+    archive.workflow2=Workflow(name='test');
+
+    #meta_data = EntryMetadata();
+    #meta_data.main_author = User();
+    #meta_data.main_author.user_id = "42";
+
+    #archive.metadata=meta_data;
+
+     # Define mainfile_path for clarity
+    parser.parse(mainfile_path, archive, logging.getLogger())
+
+    #Check if datafile available
+    assert archive.data.data_file;
+
+    archive.data.normalize(archive, logging.getLogger());
+
+    # Check if archive.data is an instance of RawFileUNITOV
+    assert isinstance(archive.data, RawFileUNITOV)
