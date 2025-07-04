@@ -110,6 +110,8 @@ package-dir = { "" = "src" }
 where = ["src"]
 
 [project.entry-points.'nomad.plugin']
+parser_eqe_entry_point = "nomad_test_parser.parsers:parser_eqe_entry_point"
+parser_mppt_entry_point = "nomad_test_parser.parsers:parser_mppt_entry_point"
 parser_entry_point = "nomad_test_parser.parsers:parser_entry_point"
 schema_package_entry_point = "nomad_test_parser.schema_packages:schema_package_entry_point"
 normalizer_entry_point = "nomad_test_parser.normalizers:normalizer_entry_point"

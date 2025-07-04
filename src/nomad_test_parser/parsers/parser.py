@@ -269,10 +269,10 @@ class UNITOV_EQEmeasurement(EQEMeasurement, RawFileUNITOV):
 
             self.eqe_data = eqe_data
 
-        if eqe_data:
-            band_gaps = np.array([d.bandgap_eqe.magnitude for d in eqe_data])
+        # if eqe_data:
+        #     band_gaps = np.array([d.bandgap_eqe.magnitude for d in eqe_data])
 
-            add_band_gap(archive, band_gaps[np.isfinite(band_gaps)].mean())
+        #     add_band_gap(archive, band_gaps[np.isfinite(band_gaps)].mean())
 
         super().normalize(archive, logger)
 
@@ -348,12 +348,14 @@ class EQEParser(MatchingParser):
         #entry = UNITOV_JVmeasurement()
         notes = ''
 
-
+        basename = os.path.basename(mainfile)
+        file_name = f'{basename}.archive.json'
         archive.data = UNITOV_EQEmeasurement()
         archive.data.message = 'This is a test EQE measurement parsing.'
         archive.data.datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-        archive.data.data_file = mainfile;
+        archive.data.data_file = basename;
         archive.data.m_to_dict(with_root_def=True)
+        create_archive(archive.data, archive, file_name, overwrite=True)
 
 class MPPTParser(MatchingParser):
     def parse(
@@ -370,12 +372,14 @@ class MPPTParser(MatchingParser):
         #entry = UNITOV_JVmeasurement()
         notes = ''
 
+        file_name = f'{os.path.basename(mainfile)}.archive.json'
 
         archive.data = UNITOV_MPPTracking_Measurement()
         archive.data.message = 'This is a test MPPT measurement parsing.'
         archive.data.datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-        archive.data.data_file = mainfile;
+        archive.data.data_file = os.path.basename(mainfile)
         archive.data.m_to_dict(with_root_def=True)
+        create_archive(archive.data, archive, file_name, overwrite=True)
 
 
 class JVParser(MatchingParser):
